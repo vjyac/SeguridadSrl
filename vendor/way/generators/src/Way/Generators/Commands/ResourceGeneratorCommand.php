@@ -26,14 +26,14 @@ class ResourceGeneratorCommand extends Command {
     protected $description = 'Generate a resource.';
 
     /**
-     * Model generator instance.
+     * Model generator instance
      *
      * @var Way\Generators\Generators\ResourceGenerator
      */
     protected $generator;
 
     /**
-     * File cache.
+     * File cache
      *
      * @var Cache
      */
@@ -82,13 +82,8 @@ class ResourceGeneratorCommand extends Command {
         $this->generateMigration();
         $this->generateSeed();
 
-        if (get_called_class() === 'Way\\Generators\\Commands\\ScaffoldGeneratorCommand')
-        {
-            $this->generateTest();
-        }
-
         $this->generator->updateRoutesFile($this->model);
-        $this->info('Updated ' . app_path() . '/routes.php');
+        $this->info('Updated app/routes.php');
 
         // We're all finished, so we
         // can delete the cache.
@@ -96,7 +91,7 @@ class ResourceGeneratorCommand extends Command {
     }
 
     /**
-     * Get the path to the template for a model.
+     * Get the path to the template for a model
      *
      * @return string
      */
@@ -106,7 +101,7 @@ class ResourceGeneratorCommand extends Command {
     }
 
     /**
-     * Get the path to the template for a controller.
+     * Get the path to the template for a controller
      *
      * @return string
      */
@@ -116,7 +111,7 @@ class ResourceGeneratorCommand extends Command {
     }
 
     /**
-     * Get the path to the template for a view.
+     * Get the path to the template for a view
      *
      * @return string
      */
@@ -149,35 +144,11 @@ class ResourceGeneratorCommand extends Command {
      */
    protected function generateController()
     {
-        $name = Pluralizer::plural($this->model);
-
         $this->call(
             'generate:controller',
             array(
-                'name' => "{$name}Controller",
+                'name' => "{$this->model}sController", // todo
                 '--template' => $this->getControllerTemplatePath()
-            )
-        );
-    }
-
-    /**
-     * Call generate:test
-     *
-     * @return void
-     */
-    protected function generateTest()
-    {
-        if ( ! file_exists(app_path() . '/tests/controllers'))
-        {
-            mkdir(app_path() . '/tests/controllers');
-        }
-
-        $this->call(
-            'generate:test',
-            array(
-                'name' => Pluralizer::plural(strtolower($this->model)) . 'Test',
-                '--template' => $this->getTestTemplatePath(),
-                '--path' => app_path() . '/tests/controllers'
             )
         );
     }
@@ -207,7 +178,7 @@ class ResourceGeneratorCommand extends Command {
 
         // Let's filter through all of our needed views
         // and create each one.
-        foreach($views as $view)
+        foreach(array('index', 'show', 'create', 'edit') as $view)
         {
             $path = $view === 'scaffold' ? $layouts : $container;
             $this->generateView($view, $path);
@@ -240,12 +211,10 @@ class ResourceGeneratorCommand extends Command {
      */
     protected function generateMigration()
     {
-        $name = 'create_' . Pluralizer::plural($this->model) . '_table';
-
         $this->call(
             'generate:migration',
             array(
-                'name'      => $name,
+                'name'      => "create_{$this->model}s_table",
                 '--fields'  => $this->option('fields')
             )
         );
@@ -281,7 +250,7 @@ class ResourceGeneratorCommand extends Command {
     protected function getOptions()
     {
         return array(
-            array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations folder', app_path() . '/database/migrations'),
+            array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations folder', 'app/database/migrations'),
             array('fields', null, InputOption::VALUE_OPTIONAL, 'Table fields', null)
         );
     }

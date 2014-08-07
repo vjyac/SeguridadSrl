@@ -23,26 +23,22 @@ class GeneratorsServiceProvider extends ServiceProvider {
 	{
 		$this->registerModelGenerator();
 		$this->registerControllerGenerator();
-		$this->registerTestGenerator();
 		$this->registerResourceGenerator();
 		$this->registerScaffoldGenerator();
 		$this->registerViewGenerator();
 		$this->registerMigrationGenerator();
-		$this->registerPivotGenerator();
 		$this->registerSeedGenerator();
 		$this->registerFormDumper();
 
 		$this->commands(
 			'generate.model',
 			'generate.controller',
-			'generate.test',
 			'generate.scaffold',
 			'generate.resource',
 			'generate.view',
 			'generate.migration',
 			'generate.seed',
-			'generate.form',
-			'generate.pivot'
+			'generate.form'
 		);
 	}
 
@@ -75,22 +71,6 @@ class GeneratorsServiceProvider extends ServiceProvider {
 			$generator = new Generators\ControllerGenerator($app['files'], $cache);
 
 			return new Commands\ControllerGeneratorCommand($generator);
-		});
-	}
-
-	/**
-	 * Register generate:test
-	 *
-	 * @return Commands\TestGeneratorCommand
-	 */
-	protected function registerTestGenerator()
-	{
-		$this->app['generate.test'] = $this->app->share(function($app)
-		{
-			$cache = new Cache($app['files']);
-			$generator = new Generators\TestGenerator($app['files'], $cache);
-
-			return new Commands\TestGeneratorCommand($generator);
 		});
 	}
 
@@ -159,20 +139,7 @@ class GeneratorsServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Register generate:pivot
-	 *
-	 * @return Commands\PivotGeneratorCommand
-	 */
-	protected function registerPivotGenerator()
-	{
-		$this->app['generate.pivot'] = $this->app->share(function($app)
-		{
-			return new Commands\PivotGeneratorCommand;
-		});
-	}
-
-	/**
-	 * Register generate:seed
+	 * Register generate:migration
 	 *
 	 * @return Commands\MigrationGeneratorCommand
 	 */

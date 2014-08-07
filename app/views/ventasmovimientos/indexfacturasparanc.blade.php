@@ -28,13 +28,6 @@
 									{{ Form::open(array('route' => 'ventasmovimientos.nccreate', "autocomplete"=>"off", 'class' => 'panel-body wrapper-lg')) }}
 
 
-							<div class="row">
-							<div class="col-xs-3">
-								<label>Fecha</label>
-									{{ Form::text('fecha', '', array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha', 'name' =>'fecha', 'placeholder' => 'Fecha', 'data-date-format' => 'dd-mm-yyyy')) }}
-								</div>
-							</div>
-							<br>
 							<div class="checkbox">
 								<label>
 									<input type="checkbox" name="sinseleccion" id="sinseleccion" value="si">
@@ -44,6 +37,7 @@
 
 							{{ Form::hidden('clientes_id' , $cliente->id, array('id' =>$cliente->id)) }}
 							{{ Form::hidden('empresas_id' , $empresas_id, array('id' =>$empresas_id)) }}
+							{{ Form::hidden('fecha' , $fecha, array('fecha' =>$fecha)) }}
 
 							<br>
 
@@ -132,7 +126,5 @@
 	}
 
 		?>
-<script src="/js/app.v2.js"></script>
-<script src="/js/datepicker/bootstrap-datepicker.js" cache="false"></script>
 
 @stop

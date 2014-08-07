@@ -23,14 +23,34 @@
 				<div class="row">
 					<div class="col-xs-6">
 						<label>Fecha</label>
-						{{ Form::text('fecha', $ventasmovimiento->fecha, array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha', 'placeholder' => 'Fecha', 'data-date-format' => 'dd-mm-yyyy')) }}
+						{{ Form::text('fecha', date("d-m-Y", strtotime($ventasmovimiento->fecha)), array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha', 'placeholder' => 'Fecha', 'data-date-format' => 'dd-mm-yyyy')) }}
+						<br> <?php
+							if ($errors->first('fecha')) {
+									?>
+								<div class="alert alert-danger">
+								<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+								<div class="alert-link">{{ $errors->first('fecha') }}</div>
+							</div>
+						<?php } ?>
+
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="col-xs-6">
 						<label>Fecha vencimiento</label>
-						{{ Form::text('fecha_vencimiento', $ventasmovimiento->fecha_vencimiento, array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha_vencimiento', 'placeholder' => 'Fecha vencimiento', 'data-date-format' => 'dd-mm-yyyy')) }}
+						{{ Form::text('fecha_vencimiento', date("d-m-Y", strtotime($ventasmovimiento->fecha_vencimiento)), array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha_vencimiento', 'placeholder' => 'Fecha vencimiento', 'data-date-format' => 'dd-mm-yyyy')) }}
+
+
+						<br> <?php
+							if ($errors->first('fecha_vencimiento')) {
+									?>
+								<div class="alert alert-danger">
+								<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+								<div class="alert-link">{{ $errors->first('fecha_vencimiento') }}</div>
+							</div>
+						<?php } ?>
+
 					</div>
 				</div>
 

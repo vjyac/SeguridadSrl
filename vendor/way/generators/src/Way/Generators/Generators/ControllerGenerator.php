@@ -14,21 +14,16 @@ class ControllerGenerator extends Generator {
      * @param  string $name
      * @return string Compiled template
      */
-    protected function getTemplate($template, $className)
+    protected function getTemplate($template, $name)
     {
         $this->template = $this->file->get($template);
-        $resource = strtolower(Pluralizer::plural(
-            str_ireplace('Controller', '', $className)
-        ));
 
         if ($this->needsScaffolding($template))
         {
-            $this->template = $this->getScaffoldedController($template, $className);
+            $this->template = $this->getScaffoldedController($template, $name);
         }
 
-        $template = str_replace('{{className}}', $className, $this->template);
-
-        return str_replace('{{collection}}', $resource, $template);
+        return str_replace('{{name}}', $name, $this->template);
     }
 
     /**
@@ -38,14 +33,13 @@ class ControllerGenerator extends Generator {
      * @param  string $name
      * @return string
      */
-    protected function getScaffoldedController($template, $className)
+    protected function getScaffoldedController($template, $name)
     {
-        $model = $this->cache->getModelName();  // post
-        $models = Pluralizer::plural($model);   // posts
-        $Models = ucwords($models);             // Posts
-        $Model = Pluralizer::singular($Models); // Post
+        $collection = strtolower(str_replace('Controller', '', $name)); // dogs
+        $modelInstance = Pluralizer::singular($collection); // dog
+        $modelClass = ucwords($modelInstance); // Dog
 
-        foreach(array('model', 'models', 'Models', 'Model', 'className') as $var)
+        foreach(array('modelInstance', 'modelClass', 'collection') as $var)
         {
             $this->template = str_replace('{{'.$var.'}}', $$var, $this->template);
         }

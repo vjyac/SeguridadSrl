@@ -3,13 +3,12 @@ This Laravel 4 package provides a variety of generators to speed up your develop
 - `generate:model`
 - `generate:controller`
 - `generate:seed`
+- `generate:test`
 - `generate:view`
 - `generate:migration`
 - `generate:resource`
-- `generate:scaffold`
-- `generate:form`
-- `generate:test`
-- `generate:pivot` <-- NEW!!
+- `generate:scaffold` *<-- NEW!!*
+- `generate:form` *<-- NEW!!*
 
 ## Prefer a Video Walk-through?
 
@@ -19,11 +18,10 @@ This Laravel 4 package provides a variety of generators to speed up your develop
 
 Begin by installing this package through Composer. Edit your project's `composer.json` file to require `way/generators`.
 
-	"require": {
+    "require": {
 		"laravel/framework": "4.0.*",
 		"way/generators": "dev-master"
-	},
-	"minimum-stability" : "dev"
+	}
 
 Next, update Composer from the Terminal:
 
@@ -46,18 +44,16 @@ Think of generators as an easy way to speed up your workflow. Rather than openin
 - [Migrations](#migrations)
 - [Models](#models)
 - [Views](#views)
-- [Seeds](#seeds)
+- [Seeds](#controllers)
 - [Resources](#resources)
 - [Scaffolding](#scaffolding)
 - [Forms](#forms)
-- [Tests](#tests)
-- [Pivot Tables](#pivot-tables)
 
 ### Migrations
 
 Laravel 4 offers a migration generator, but it stops just short of creating the schema (or the fields for the table). Let's review a couple examples, using `generate:migration`.
 
-    php artisan generate:migration create_posts_table
+    php artisan generate:migration create_post_table
 
 If we don't specify the `fields` option, the following file will be created within `app/database/migrations`.
 
@@ -66,7 +62,7 @@ If we don't specify the `fields` option, the following file will be created with
 
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePostsTable extends Migration {
+class CreatePostTable extends Migration {
 
     /**
 	 * Run the migrations.
@@ -75,7 +71,7 @@ class CreatePostsTable extends Migration {
 	 */
 	public function up()
 	{
-	  Schema::create('posts', function($table)
+	  Schema::create('post', function($table)
 	  {
 	    $table->increments('id');
 
@@ -90,7 +86,7 @@ class CreatePostsTable extends Migration {
 	 */
 	public function down()
 	{
-	  Schema::drop('posts');
+	  Schema::drop('post');
 	}
 
 }
@@ -148,7 +144,7 @@ When writing migration names, use the following keywords to provide hints for th
 
 - `create` or `make` (`create_users_table`)
 - `add` or `insert` (`add_user_id_to_posts_table`)
-- `remove` or `drop` or `delete` (`remove_user_id_from_posts_table`)
+- `remove` or `drop` (`remove_user_id_from_posts_table`)
 
 #### Generating Schema
 
@@ -206,18 +202,9 @@ To declare fields, use a comma-separated list of key:value:option sets, where `k
 - `--fields="first:string, last:string"`
 - `--fields="age:integer, yob:date"`
 - `--fields="username:string:unique, age:integer:nullable"`
-- `--fields="name:string:default('John'), email:string:unique:nullable"`
 - `--fields="username:string[30]:unique, age:integer:nullable"`
 
 Please make note of the last example, where we specify a character limit: `string[30]`. This will produce `$table->string('username', 30)->unique();`
-
-It is possible to destroy the table by issuing:
-
-	php artisan generate:migration destroy_posts_table
-	
-If you'd like to have an accurate artisan rollback option set the `fields` option as well:
-
-	php artisan generate:migration destroy_posts_table --fields="title:string, body:text"
 
 As a final demonstration, let's run a migration to remove the `completed` field from a `tasks` table.
 
@@ -323,7 +310,7 @@ To fully seed the `dogs` table:
 
 ### Resources
 
-Think of the resource generator as the big enchilada. It calls all of its sibling generate commands. Assuming the following command:
+Think of the resource generator as the big enchilda. It calls all of its sibling generate commands. Assuming the following command:
 
     php artisan generate:resource dog --fields="name:string"
 
@@ -409,9 +396,9 @@ The only difference is that it will handle all of the boilerplate. This can be p
 This handy new generator allows you to, with a single command, generate the necessary HTML for a form, based on attributes from a provided model. Perhaps an example is in order:
 
 ```bash
-php artisan generate:form tweet
+php artisan generate:form dog
 ```
-Assuming that I do have a `Tweet` model and its associated `tweet` table, this command will output:
+Assuming that I do have a `Dog` model and its associated `dogs` table, this command will output:
 
 ```html
 {{ Form::open(array('route' => 'tweets.store')) }}
@@ -438,7 +425,7 @@ Pretty neat, huh? It read the attributes and data types, and prepared the markup
 But what if you intend to update a resource, rather than create a new one? Well, in that case, use the `--method` option.
 
 ```bash
-php artisan generate:form tweet --method="update"
+php artisan generate:form dog --method="update"
 ```
 
 This will mostly generate the same HTML, however, the `Form::open()` method will be adjusted, as needed:
@@ -486,76 +473,5 @@ php artisan generate:form tweet | pbcopy
 
 # save it to a form partial
 php artisan generate:form tweet > app/views/posts/form.blade.php
-```
-### Tests
-
-Use `generate:test` when you need to create a new PHPUnit test class. Here's an example:
-
-```bash
-php artisan generate:test FooTest
-```
-
-This will produce `app/tests/FooTest.php`.
-
-```php
-<?php
-
-class FooTest extends TestCase {
-
-    public function test()
-    {
-
-    }
-
-}
-```
-
-### Pivot Tables
-
-Creating joinable/pivot tables can sometimes be confusing.
-
-- Should the table names be plural?
-- In what order do we write the table names to make Laravel happy?
-- What fields should be in the pivot table?
-
-This process can be automated now. Simply call the `generate:pivot`
-command, and provide the names of the tables that should be joinable.
-For example, a post can have many tags, and a tag can have many posts.
-Run the following command to create the necessary pivot table.
-
-```bash
-php artisan generate:pivot posts tags
-```
-
-It doesn't matter which order you provide the table names (or whether
-you pluralize them or not). The command will correctly create a
-`post_tag` migration that has `post_id` and `tag_id` fields.
-
-```php
-Schema::create('post_tag', function(Blueprint $table) {
-    $table->integer('post_id');
-    $table->integer('tag_id');
-});
-```
-
-
-Finally, simply migrate the database to create it.
-
-```bash
-php artisan migrate
-```
-
-Pivot table finished!
-
-To put it all together, let's do it from scratch. We need a posts table,
-a tags table, and the connecting pivot table for the two. We can tackle
-this easily with the generators.
-
-```bash
-php artisan generate:migration create_posts_table --fields="title:string, description:text"
-
-php artisan generate:migration create_tags_table --fields="name:string"
-
-php artisan generate:pivot posts tags
 ```
 

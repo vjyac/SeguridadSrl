@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -42,17 +42,16 @@ EOS;
 
         $tpl = $m->loadTemplate($src);
 
-
-        $data = new Mustache_Test_Functional_ClassWithLambda();
+        $data = new Mustache_Test_FiveThree_Functional_ClassWithLambda();
         $this->assertEquals($expected, $tpl->render($data));
     }
 }
 
-class Mustache_Test_Functional_ClassWithLambda
+class Mustache_Test_FiveThree_Functional_ClassWithLambda
 {
     public function _t()
     {
-        return function($val) {
+        return function ($val) {
             return strtoupper($val);
         };
     }

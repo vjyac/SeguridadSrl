@@ -27,6 +27,16 @@
 <div class="col-xs-6">
 <label>Fecha</label>
 {{ Form::text('fecha', '', array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha', 'placeholder' => 'Fecha', 'data-date-format' => 'dd-mm-yyyy')) }}
+
+<br> <?php
+	if ($errors->first('fecha')) {
+			?>
+		<div class="alert alert-danger">
+		<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+		<div class="alert-link">{{ $errors->first('fecha') }}</div>
+	</div>
+<?php } ?>
+
 </div>
 </div>
 
@@ -34,6 +44,16 @@
 <div class="col-xs-6">
 <label>Fecha vencimiento</label>
 {{ Form::text('fecha_vencimiento', '', array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha_vencimiento', 'placeholder' => 'Fecha vencimiento', 'data-date-format' => 'dd-mm-yyyy')) }}
+
+<br> <?php
+	if ($errors->first('fecha_vencimiento')) {
+			?>
+		<div class="alert alert-danger">
+		<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+		<div class="alert-link">{{ $errors->first('fecha_vencimiento') }}</div>
+	</div>
+<?php } ?>
+
 </div>
 </div>
 
@@ -42,6 +62,14 @@
 <div class="col-xs-8">
 <label>Tipo documento</label>
 	{{ Form::select('tipodocumento', array('F' => 'Factura', 'ND' => 'Nota de Debito'), 'S', array('class' => 'form-control input-lg', 'id' =>'tipodocumento')) }}
+<br> <?php
+	if ($errors->first('tipodocumento')) {
+			?>
+		<div class="alert alert-danger">
+		<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+		<div class="alert-link">{{ $errors->first('tipodocumento') }}</div>
+	</div>
+<?php } ?>
 </div>
 </div>
 
@@ -60,9 +88,18 @@
 <div class="row">
 <div class="col-xs-8">
 <label>Cliente</label>
-{{ Form::text('cliente', '', array('class' => 'form-control input-lg', 'id' =>'cliente', 'placeholder' => 'Ingrese un cliente')) }}
+			{{ Form::text('cliente', '', array('class' => 'form-control input-lg', 'id' =>'cliente', 'placeholder' => 'Ingrese un cliente')) }}
+			{{ Form::hidden('clientes_id' , '0', array('id' =>'clientes_id')) }}
 
-			{{ Form::hidden('clientes_id' , Input::old('clientes_id'), array('id' =>'clientes_id')) }}
+			<br> <?php
+				if ($errors->first('clientes_id')) {
+						?>
+					<div class="alert alert-danger">
+					<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+					<div class="alert-link">{{ $errors->first('clientes_id') }}</div>
+				</div>
+			<?php } ?>
+
 </div>
 </div>
 

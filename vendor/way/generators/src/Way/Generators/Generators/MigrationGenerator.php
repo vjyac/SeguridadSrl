@@ -59,29 +59,19 @@ class MigrationGenerator extends Generator {
     {
         // create_users_table
         // add_user_id_to_posts_table
-        // create_post_tag_table
         $pieces = explode('_', $name);
 
-        // This is the action that the user
-        // wants to take. Create or Delete or Add.
-        $action = array_shift($pieces);
+        $action = $pieces[0];
 
-        // Adding _table to the migration name is optional
-        if (end($pieces) == 'table') array_pop($pieces);
-
-        // Next, we need to determine what the table name is.
-        // This is tough, because it could be something like
-        // posts, or posts_tags. Further, the migration name could
-        // be 'create_posts_tags_table', or 'add_post_id_to_posts_tags_table'
-        // So we'll search for the keywords 'to' or 'from'.
-        $divider = array_search('to', $pieces);
-        if ($divider === false) $divider = array_search('from', $pieces);
-
-        // If we did find one of those "to" or "from" connecting words,
-        // we know that what follows is the table name.
-        $tableName = ($divider !== false)
-            ? implode('_', array_slice($pieces, $divider + 1))
-            : implode('_', $pieces);
+        // If the migration name is create_users,
+        // then we'll set the tableName to the last
+        // item. But, if it's create_users_table,
+        // then we have to compensate, accordingly.
+        $tableName = end($pieces);
+        if ( $tableName === 'table' )
+        {
+            $tableName = prev($pieces);
+        }
 
         // For example: ['add', 'posts']
         return array($action, $tableName);
@@ -103,18 +93,7 @@ class MigrationGenerator extends Generator {
 
             case 'remove':
             case 'drop':
-            case 'delete':
                 $upMethod = $this->file->get(__DIR__ . '/templates/migration/migration-up.txt');
-                $fields = $this->fields ? $this->setFields('dropColumn') : '';
-                break;
-
-            case 'pivot':
-                $upMethod = $this->file->get(__DIR__ .'/templates/migration/migration-up-pivot.txt');
-                $fields = $this->fields ? $this->setFields('addColumn') : '';
-                break;
-
-            case 'destroy':
-                $upMethod = $this->file->get(__DIR__ . '/templates/migration/migration-up-drop.txt');
                 $fields = $this->fields ? $this->setFields('dropColumn') : '';
                 break;
 
@@ -150,15 +129,8 @@ class MigrationGenerator extends Generator {
 
           case 'remove':
           case 'drop':
-          case 'delete':
             // then we need to add the columns in reverse
             $downMethod = $this->file->get(__DIR__ . '/templates/migration/migration-down.txt');
-            $fields = $this->fields ? $this->setFields('addColumn') : '';
-            break;
-
-          case 'destroy':
-            // then we need to create the table in reverse
-            $downMethod = $this->file->get(__DIR__ . '/templates/migration/migration-down-create.txt');
             $fields = $this->fields ? $this->setFields('addColumn') : '';
             break;
 
@@ -205,6 +177,7 @@ class MigrationGenerator extends Generator {
     */
     protected function convertFieldsToArray()
     {
+        // TODO this needs to be injected
         $fields = $this->fields;
 
         if ( !$fields ) return;
@@ -216,21 +189,14 @@ class MigrationGenerator extends Generator {
             $columnInfo = preg_split('/ ?: ?/', $bit);
 
             $bit = new \StdClass;
-            $bit->name = array_shift($columnInfo);
-            $bit->type = array_shift($columnInfo);
+            $bit->name = $columnInfo[0];
+            $bit->type = $columnInfo[1];
 
             // If there is a third key, then
-            // the user is setting any number
-            // of options
-            if ( isset($columnInfo[0]) )
+            // the user is setting an index/option.
+            if ( isset($columnInfo[2]) )
             {
-                $bit->options = '';
-                foreach($columnInfo as $option)
-                {
-                    $bit->options .= (str_contains($option, '('))
-                        ? "->{$option}"
-                        : "->{$option}()";
-                }
+                $bit->index = $columnInfo[2];
             }
         }
 
@@ -262,9 +228,11 @@ class MigrationGenerator extends Generator {
             : "('{$field->name}')";
 
         // Take care of any potential indexes or options
-        if (isset($field->options))
+        if ( isset($field->index) )
         {
-            $html .= $field->options;
+            $html .= str_contains($field->index, '(')
+                ? "->{$field->index}"
+                : "->{$field->index}()";
         }
 
         return $html.';';

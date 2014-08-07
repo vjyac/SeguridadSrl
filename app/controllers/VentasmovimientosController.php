@@ -37,15 +37,12 @@ class VentasmovimientosController extends BaseController {
 	public function store()
 	{
 
-
-
-		// echo Input::get('tipodocumento');
+		// echo Input::get('clientes_id');
 		// die;
 		// $input = Input::all();
 
 		// var_dump($input);
 		// die;
-
 
 		$rules = [
 			'fecha' => 'required',
@@ -55,14 +52,11 @@ class VentasmovimientosController extends BaseController {
 			'empresas_id' => 'exists:empresas,id'
 		];
 
-
-
 		if (! Ventasmovimiento::isValid(Input::all(),$rules)) {
 
 			return Redirect::back()->withInput()->withErrors(Ventasmovimiento::$errors);
 
 		}
-
 
 		$ventasmovimiento = new Ventasmovimiento;
 
@@ -171,8 +165,8 @@ class VentasmovimientosController extends BaseController {
 
 
 		$rules = [
-			'fecha' => 'required',
-			'fecha_vencimiento' => 'required',
+			'fecha' =>  array('required', 'date_format:"d-m-Y"'),
+			'fecha_vencimiento' =>  array('required', 'date_format:"d-m-Y"'),
 			'condicionesventas_id' => 'exists:condicionesventas,id',
 		];
 
@@ -576,7 +570,8 @@ public function anular($id)
 		$pdf->SetTitle('Rebibo');
 
 		// set default header data
-		$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		// $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		$pdf->SetHeaderData("../../../../../public/images/logo_empresa.jpg", PDF_HEADER_LOGO_WIDTH, "Cuenta Corriente", "Seguridad S.R.L.");
 
 		// set header and footer fonts
 		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -665,13 +660,17 @@ public function anular($id)
 	public function ctacteshow()
 	{
 
+		$cliente = Input::get('cliente', '');
 		$clientes_id = Input::get('clientes_id', 0);
+		$empresas_id = Input::get('empresas_id');
 
-		if ($clientes_id > 0) {
+		$empresa = Empresa::find($empresas_id);
+
+		if ($clientes_id > 0 and $cliente<>'') {
 
 		        $ventasmovimientos =  DB::table('ventasmovimientos')
 		        ->where('clientes_id', $clientes_id)
-		        ->where('estado', 'pendiente')
+						->where('empresas_id', $empresas_id)
 		        ->where('saldo_movimiento', '>', 0)
 		        ->orderBy('clientes_id', 'asc')
 		        ->get();
@@ -679,21 +678,28 @@ public function anular($id)
 		} else {
 		        $ventasmovimientos =  DB::table('ventasmovimientos')
 		        ->where('estado', 'pendiente')
+						->where('empresas_id', $empresas_id)
 		        ->where('saldo_movimiento', '>', 0)
 		        ->orderBy('clientes_id', 'asc')
 		        ->get();
 		}
 
 
+		if (count($ventasmovimientos) == 0 ) {
+			echo "No encontre movimientos.<br>";
+			echo "<input type='button' value='Cerrar' onclick='self.close()'>";
+			die;
+		}
+
 		$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 		// set document information
 		$pdf->SetCreator(PDF_CREATOR);
 		$pdf->SetAuthor('CodexControl.com');
-		$pdf->SetTitle('Rebibo');
+		$pdf->SetTitle('CtaCte');
 
 		// set default header data
-		$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		$pdf->SetHeaderData("../../../../../public/images/logo_empresa.jpg", PDF_HEADER_LOGO_WIDTH, "Cuenta Corriente", $empresa->empresa);
 
 		// set header and footer fonts
 		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -781,17 +787,44 @@ public function anular($id)
 
 					$tiposdocumento = Tiposdocumento::find($ventasmovimiento->tiposdocumentos_id);
 
+
+					$relleno_inicio = "";
+					$relleno_fin = "";
+
+					if ( $ventasmovimiento->tiposdocumentos_id == 1
+								or $ventasmovimiento->tiposdocumentos_id == 2
+								or $ventasmovimiento->tiposdocumentos_id == 3
+								or $ventasmovimiento->tiposdocumentos_id == 4
+								or $ventasmovimiento->tiposdocumentos_id == 7
+								or $ventasmovimiento->tiposdocumentos_id == 8
+
+					) {
+							$total_cliente += $ventasmovimiento->saldo_movimiento;
+							$total_general += $ventasmovimiento->saldo_movimiento;
+
+					} elseif (
+								   $ventasmovimiento->tiposdocumentos_id == 6
+								or $ventasmovimiento->tiposdocumentos_id == 9
+								or $ventasmovimiento->tiposdocumentos_id == 11
+					) {
+							$total_cliente -= $ventasmovimiento->saldo_movimiento;
+							$total_general -= $ventasmovimiento->saldo_movimiento;
+							$relleno_inicio = "(";
+							$relleno_fin = ")";
+					}
+
 					$html .= "<tr>";
 
-			        $html .= "<td>" . $ventasmovimiento->fecha . "</td>";
-			        $html .= "<td>" . $tiposdocumento->tiposdocumento . "</td>";
-			        $html .= "<td>" . str_pad($ventasmovimiento->numero_comprobante, 12, '0', STR_PAD_LEFT) . "</td>";
-			        $html .= "<td align=\"right\">" . $ventasmovimiento->saldo_movimiento . "</td>";
+							$html .= "<td>" . $ventasmovimiento->fecha . "</td>";
+							$html .= "<td>" . $tiposdocumento->tiposdocumento . "</td>";
+							$html .= "<td>" . str_pad($ventasmovimiento->numero_comprobante, 12, '0', STR_PAD_LEFT) . "</td>";
+							$html .= "<td align=\"right\">" . $relleno_inicio . $ventasmovimiento->saldo_movimiento . $relleno_fin . "</td>";
 
 					$html .= "</tr>";
 
-					$total_cliente += $ventasmovimiento->saldo_movimiento;
-			    	$total_general += $ventasmovimiento->saldo_movimiento;
+
+
+
 			}
 
 			$html .= "<tr>";
@@ -852,13 +885,34 @@ public function anular($id)
 	public function ventashow()
 	{
 
+
+
+		$rules = [
+			'fecha_desde' =>  array('required', 'date_format:"d-m-Y"'),
+			'fecha_hasta' =>  array('required', 'date_format:"d-m-Y"'),
+			'empresas_id' => 'exists:empresas,id',
+		];
+
+
+
+
+		if (! Ventasmovimiento::isValid(Input::all(),$rules)) {
+
+			return Redirect::back()->withInput()->withErrors(Ventasmovimiento::$errors);
+
+		}
+
 		$fecha_desde = date("Y-m-d", strtotime(Input::get('fecha_desde')));
 		$fecha_hasta = date("Y-m-d", strtotime(Input::get('fecha_hasta')));
+		$empresas_id = Input::get('empresas_id');
 
+
+		$empresa = Empresa::find($empresas_id);
 
         $ventasmovimientos =  DB::table('ventasmovimientos')
         ->where('fecha', '>=', $fecha_desde)
         ->where('fecha', '<=', $fecha_hasta)
+				->where('empresas_id', '=', $empresas_id)
         ->whereIn('tiposdocumentos_id', array(1, 2, 3, 4))
         ->whereIn('estado', array('cerrada', 'pendiente'))
         ->orderBy('fecha', 'asc')
@@ -873,7 +927,8 @@ public function anular($id)
 		$pdf->SetTitle('Ventas entre Fechas');
 
 		// set default header data
-		$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		// $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		$pdf->SetHeaderData("../../../../../public/images/logo_empresa.jpg", PDF_HEADER_LOGO_WIDTH, "Informe Ventas", $empresa->empresa);
 
 		// set header and footer fonts
 		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -1019,13 +1074,29 @@ public function anular($id)
 	public function reciboshow()
 	{
 
+		$rules = [
+			'fecha_desde' =>  array('required', 'date_format:"d-m-Y"'),
+			'fecha_hasta' =>  array('required', 'date_format:"d-m-Y"'),
+			'empresas_id' => 'exists:empresas,id',
+		];
+
+		if (! Ventasmovimiento::isValid(Input::all(),$rules)) {
+
+			return Redirect::back()->withInput()->withErrors(Ventasmovimiento::$errors);
+
+		}
+
+
 		$fecha_desde = date("Y-m-d", strtotime(Input::get('fecha_desde')));
 		$fecha_hasta = date("Y-m-d", strtotime(Input::get('fecha_hasta')));
+		$empresas_id = Input::get('empresas_id');
 
+		$empresa = Empresa::find($empresas_id);
 
         $ventasmovimientos =  DB::table('ventasmovimientos')
         ->where('fecha', '>=', $fecha_desde)
         ->where('fecha', '<=', $fecha_hasta)
+				->where('empresas_id', '=', $empresas_id)
         ->whereIn('tiposdocumentos_id', array(5))
         ->whereIn('estado', array('cerrada'))
         ->orderBy('fecha', 'asc')
@@ -1040,7 +1111,8 @@ public function anular($id)
 		$pdf->SetTitle('Ventas entre Fechas');
 
 		// set default header data
-		$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		// $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		$pdf->SetHeaderData("../../../../../public/images/logo_empresa.jpg", PDF_HEADER_LOGO_WIDTH, "Cuenta Corriente", $empresa->empresa);
 
 		// set header and footer fonts
 		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -1086,7 +1158,7 @@ public function anular($id)
 		$total_iva = 0;
 
 
-		$html .= '<h1>Informe de Recibos y NC entre fechas</h1><br>';
+		$html .= '<h1>Informe de Recibos entre fechas</h1><br>';
 		$html .= '<h3>desde: ' . $fecha_desde . ' hasta: ' . $fecha_hasta . '</h3><br>';
 
 		$html .= "<table>";
@@ -1182,10 +1254,26 @@ public function anular($id)
 	public function mayorshow()
 	{
 
+		$rules = [
+			'clientes_id' => 'exists:clientes,id',
+			'fecha_desde' =>  array('required', 'date_format:"d-m-Y"'),
+			'fecha_hasta' =>  array('required', 'date_format:"d-m-Y"'),
+			'empresas_id' => 'exists:empresas,id',
+		];
+
+		if (! Ventasmovimiento::isValid(Input::all(),$rules)) {
+
+			return Redirect::back()->withInput()->withErrors(Ventasmovimiento::$errors);
+
+		}
+
+
 
 		$clientes_id = Input::get('clientes_id');
+		$empresas_id = Input::get('empresas_id');
 
 		$cliente = Cliente::find($clientes_id);
+		$empresa = Empresa::find($empresas_id);
 
 		$fecha_desde = date("Y-m-d", strtotime(Input::get('fecha_desde')));
 		$fecha_hasta = date("Y-m-d", strtotime(Input::get('fecha_hasta')));
@@ -1193,6 +1281,7 @@ public function anular($id)
 		$debe = DB::table('ventasmovimientos')
 		->whereIn('tiposdocumentos_id', array(1,2,3,4,7,10))
 		->where('clientes_id', '=', $clientes_id)
+		->where('empresas_id', '=', $empresas_id)
 		->where('fecha', '<', $fecha_desde)
 		->where('estado', 'cerrada')
 		->sum('importe_total');
@@ -1202,6 +1291,7 @@ public function anular($id)
 		$haber = DB::table('ventasmovimientos')
 		->whereIn('tiposdocumentos_id', array(5,6,9))
 		->where('clientes_id', '=', $clientes_id)
+		->where('empresas_id', '=', $empresas_id)
 		->where('fecha', '<', $fecha_desde)
 		->where('estado', 'cerrada')
 		->sum('importe_total');
@@ -1211,7 +1301,8 @@ public function anular($id)
 
         $ventasmovimientos =  DB::table('ventasmovimientos')
         ->whereIn('tiposdocumentos_id', array(1,2,3,4,5,6,7,9,10))
-		->where('clientes_id', '=', $clientes_id)
+				->where('clientes_id', '=', $clientes_id)
+				->where('empresas_id', '=', $empresas_id)
         ->where('fecha', '>=', $fecha_desde)
         ->where('fecha', '<=', $fecha_hasta)
         ->orderBy('fecha', 'asc')
@@ -1227,7 +1318,8 @@ public function anular($id)
 		$pdf->SetTitle('Ventas entre Fechas');
 
 		// set default header data
-		$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		// $pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE, PDF_HEADER_STRING);
+		$pdf->SetHeaderData("../../../../../public/images/logo_empresa.jpg", PDF_HEADER_LOGO_WIDTH, "Informe Mayor", $empresa->empresa);
 
 		// set header and footer fonts
 		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -1466,15 +1558,17 @@ public function verfacturasparanc()
 
 		$rules = [
 			'clientes_id' => 'exists:clientes,id',
+			'fecha' =>  array('required', 'date_format:"d-m-Y"')
 		];
-
-		$clientes_id = Input::get('clientes_id');
-		$empresas_id = Input::get('empresas_id');
 
 
 		if (! Ventasmovimiento::isValid(Input::all(),$rules)) {
 					return Redirect::back()->withInput()->withErrors(Ventasmovimiento::$errors);
 		}
+
+		$clientes_id = Input::get('clientes_id');
+		$empresas_id = Input::get('empresas_id');
+		$fecha = Input::get('fecha');
 
 		$cliente = Cliente::find($clientes_id);
 
@@ -1493,6 +1587,7 @@ public function verfacturasparanc()
 													'ventasmovimientos' => $ventasmovimientos,
 													'cliente' => $cliente,
 													'empresas_id' => $empresas_id,
+													'fecha' => $fecha,
 
 													));
 
@@ -1513,18 +1608,8 @@ public function verfacturasparanc()
 public function nccreate()
 {
 
-			$rules = [
-				'fecha' => 'date',
-			];
-
-
-			if (! Ventasmovimiento::isValid(Input::all(),$rules)) {
-						return Redirect::back()->withInput()->withErrors(Ventasmovimiento::$errors);
-			}
-
 
 		$fecha = Input::get('fecha');
-
 
     list($dd,$mm,$yy)=explode("-",$fecha);
 
@@ -1533,9 +1618,9 @@ public function nccreate()
 		$fechas->setDate($yy, $mm, $dd);
     $fecha= $fechas->format('Y-m-d');
 
-
 		$clientes_id = Input::get('clientes_id');
 		$empresas_id = Input::get('empresas_id');
+
 		$sinseleccion = Input::get('sinseleccion');
 		$ventasmovimientos_id = Input::get('ventasmovimientos_id');
 

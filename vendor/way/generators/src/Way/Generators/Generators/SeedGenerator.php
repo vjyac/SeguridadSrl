@@ -14,11 +14,11 @@ class SeedGenerator extends Generator {
     protected function getTemplate($template, $className)
     {
         $this->template = $this->file->get($template);
-        $models = strtolower(str_replace('TableSeeder', '', $className));
+        $pluralModel = strtolower(str_replace('TableSeeder', '', $className));
 
         $this->template = str_replace('{{className}}', $className, $this->template);
 
-        return str_replace('{{models}}', $models, $this->template);
+        return str_replace('{{pluralModel}}', $pluralModel, $this->template);
     }
 
     /**
@@ -31,14 +31,9 @@ class SeedGenerator extends Generator {
         $databaseSeederPath = app_path() . '/database/seeds/DatabaseSeeder.php';
 
         $content = $this->file->get($databaseSeederPath);
+        $content = preg_replace("/(run\(\).+?)}/us", "$1\t\$this->call('{$className}');\n\t}", $content);
 
-        if ( ! strpos($content, "\$this->call('{$className}');"))
-        {
-            $content = preg_replace("/(run\(\).+?)}/us", "$1\t\$this->call('{$className}');\n\t}", $content);
-            return $this->file->put($databaseSeederPath, $content);
-        }
-
-        return false;
+        $this->file->put($databaseSeederPath, $content);
     }
 
 }

@@ -22,7 +22,7 @@ class ControllerGeneratorCommand extends BaseGeneratorCommand {
     protected $description = 'Generate a new controller.';
 
     /**
-     * Model generator instance.
+     * Model generator instance
      *
      * @var Way\Generators\Generators\ControllerGenerator
      */
@@ -41,7 +41,7 @@ class ControllerGeneratorCommand extends BaseGeneratorCommand {
     }
 
     /**
-     * Get the path to the file that should be generated.
+     * Get the path to the file that should be generated
      *
      * @return string
      */
@@ -70,7 +70,7 @@ class ControllerGeneratorCommand extends BaseGeneratorCommand {
     protected function getOptions()
     {
         return array(
-           array('path', null, InputOption::VALUE_OPTIONAL, 'Path to controllers directory.', app_path() . '/controllers'),
+           array('path', null, InputOption::VALUE_OPTIONAL, 'Path to controllers directory.', 'app/controllers'),
            array('template', null, InputOption::VALUE_OPTIONAL, 'Path to template.', __DIR__.'/../Generators/templates/controller.txt'),
         );
     }

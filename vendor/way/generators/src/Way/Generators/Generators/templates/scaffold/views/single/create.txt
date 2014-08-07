@@ -1,20 +1,20 @@
 @section('main')
 
-<h1>Create {{Model}}</h1>
+<h1>Create {{className}}</h1>
 
-{{ Form::open(['route' => '{{models}}.store']) }}
-	<ul>
+{{ Form::open(['route' => '{{pluralModel}}.store']) }}
+    <ul>
 {{formElements}}
-		<li>
-			{{ Form::submit('Submit', array('class' => 'btn')) }}
-		</li>
-	</ul>
+        <li>
+            {{ Form::submit('Submit', array('class' => 'btn')) }}
+        </li>
+    </ul>
 {{ Form::close() }}
 
 @if ($errors->any())
-	<ul>
-		{{ implode('', $errors->all('<li class="error">:message</li>')) }}
-	</ul>
+    <ul>
+        {{ implode('', $errors->all('<li class="error">:message</li>')) }}
+    </ul>
 @endif
 
 @stop

@@ -5,8 +5,8 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class MigrationGeneratorCommand extends BaseGeneratorCommand
-{
+class MigrationGeneratorCommand extends BaseGeneratorCommand {
+
     /**
      * The console command name.
      *
@@ -22,7 +22,7 @@ class MigrationGeneratorCommand extends BaseGeneratorCommand
     protected $description = 'Generate a new migration.';
 
     /**
-     * Model generator instance.
+     * Model generator instance
      *
      * @var Way\Generators\Generators\MigrationGenerator
      */
@@ -55,13 +55,11 @@ class MigrationGeneratorCommand extends BaseGeneratorCommand
                         ->parse($name, $fields)
                         ->make($path, null);
 
-        $this->call('dump-autoload');
-
         $this->printResult($created, $path);
     }
 
     /**
-     * Get the path to the file that should be generated.
+     * Get the path to the file that should be generated
      *
      * @return string
      */
@@ -90,7 +88,7 @@ class MigrationGeneratorCommand extends BaseGeneratorCommand
     protected function getOptions()
     {
         return array(
-            array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations folder', app_path() . '/database/migrations'),
+            array('path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations folder', 'app/database/migrations'),
             array('fields', null, InputOption::VALUE_OPTIONAL, 'Table fields', null)
         );
     }

@@ -22,7 +22,7 @@ class ModelGeneratorCommand extends BaseGeneratorCommand {
 	protected $description = 'Generate a new model.';
 
 	/**
-	 * Model generator instance.
+	 * Model generator instance
 	 *
 	 * @var Way\Generators\Generators\ModelGenerator
 	 */
@@ -40,15 +40,15 @@ class ModelGeneratorCommand extends BaseGeneratorCommand {
 		$this->generator = $generator;
 	}
 
-	/**
-	 * Get the path to the file that should be generated.
-	 *
-	 * @return string
-	 */
-	protected function getPath()
-    	{
-		return $this->option('path') . '/' . ucwords($this->argument('name')) . '.php';
-	}
+    /**
+     * Get the path to the file that should be generated
+     *
+     * @return string
+     */
+    protected function getPath()
+    {
+       return $this->option('path') . '/' . ucwords($this->argument('name')) . '.php';
+    }
 
 	/**
 	 * Get the console command arguments.
@@ -70,7 +70,7 @@ class ModelGeneratorCommand extends BaseGeneratorCommand {
 	protected function getOptions()
 	{
 		return array(
-			array('path', null, InputOption::VALUE_OPTIONAL, 'Path to the models directory.', app_path() . '/models'),
+			array('path', null, InputOption::VALUE_OPTIONAL, 'Path to the models directory.', 'app/models'),
 			array('template', null, InputOption::VALUE_OPTIONAL, 'Path to template.', __DIR__.'/../Generators/templates/model.txt')
 		);
 	}

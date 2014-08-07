@@ -208,14 +208,6 @@
                     <span>Recibos</span>
                   </a>
                 </li>
-                <li >
-                  <a href="/ventasmovimientos/ctactes" >
-                    <i class="fa fa-angle-right"></i>
-                    <span>Cta Cte</span>
-                  </a>
-                </li>
-
-
             <li >
               <a href="#table" >
                 <i class="fa fa-angle-up text-active"></i>
@@ -223,6 +215,13 @@
                 <i class="fa fa-angle-down text"></i>
               </a>
               <ul class="nav bg">
+                <li >
+                  <a href="/ventasmovimientos/ctactes" >
+                    <i class="fa fa-angle-right"></i>
+                    <span>Cta Cte</span>
+                  </a>
+                </li>
+
                 <li >
                   <a href="/ventasmovimientos/informeventas" >
                     <i class="fa fa-angle-right"></i>

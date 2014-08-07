@@ -23,13 +23,39 @@
 , 'class' => 'panel-body wrapper-lg')) }}
 
 
+<div class="row">
+<div class="col-xs-5">
+	<label>Fecha</label>
+		{{ Form::text('fecha', '', array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha', 'name' =>'fecha', 'placeholder' => 'Fecha', 'data-date-format' => 'dd-mm-yyyy')) }}
+		<br> <?php
+			if ($errors->first('fecha')) {
+					?>
+				<div class="alert alert-danger">
+				<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+				<div class="alert-link">{{ $errors->first('fecha') }}</div>
+			</div>
+		<?php } ?>
+
+	</div>
+</div>
 
 <div class="row">
 <div class="col-xs-8">
 <label>Cliente</label>
 {{ Form::text('cliente', '', array('class' => 'form-control input-lg', 'id' =>'cliente', 'placeholder' => 'Ingrese un cliente')) }}
+			{{ Form::hidden('clientes_id' , '0', array('id' =>'clientes_id')) }}
 
-			{{ Form::hidden('clientes_id' , Input::old('clientes_id'), array('id' =>'clientes_id')) }}
+			<br> <?php
+				if ($errors->first('clientes_id')) {
+						?>
+					<div class="alert alert-danger">
+					<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+					<div class="alert-link">{{ $errors->first('clientes_id') }}</div>
+				</div>
+			<?php } ?>
+
+
+
 </div>
 </div>
 

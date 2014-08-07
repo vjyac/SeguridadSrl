@@ -35,10 +35,11 @@ class ViewGenerator extends Generator {
      */
     protected function getScaffoldedTemplate($name)
     {
-        $model = $this->cache->getModelName();  // post
-        $models = Pluralizer::plural($model);   // posts
-        $Models = ucwords($models);             // Posts
-        $Model = Pluralizer::singular($Models); // Post
+        $model = $this->cache->getModelName();
+
+        $pluralModel = Pluralizer::plural($model); // posts
+        $formalModel = ucwords($pluralModel); // Posts
+        $className = Pluralizer::singular($formalModel);
 
         // Create and Edit views require form elements
         if ($name === 'create.blade' or $name === 'edit.blade')
@@ -49,7 +50,7 @@ class ViewGenerator extends Generator {
         }
 
         // Replace template vars in view
-        foreach(array('model', 'models', 'Models', 'Model') as $var)
+        foreach(array('model', 'pluralModel', 'formalModel', 'className') as $var)
         {
             $this->template = str_replace('{{'.$var.'}}', $$var, $this->template);
         }
@@ -70,8 +71,6 @@ class ViewGenerator extends Generator {
      */
     protected function makeTableRows($model)
     {
-        $models = Pluralizer::plural($model); // posts
-
         $fields = $this->cache->getFields();
 
         // First, we build the table headings
@@ -81,15 +80,15 @@ class ViewGenerator extends Generator {
 
         // And then the rows, themselves
         $fields = array_map(function($field) use ($model) {
-            return "<td>{{{ \$$model->$field }}}</td>";
+            return "<td>{{ \$$model->$field }}</td>";
         }, array_keys($fields));
 
         // Now, we'll add the edit and delete buttons.
         $editAndDelete = <<<EOT
-                    <td>{{ link_to_route('{$models}.edit', 'Edit', array(\${$model}->id), array('class' => 'btn btn-info')) }}</td>
+                    <td>{{ link_to_route('{$model}s.edit', 'Edit', array(\${$model}->id), array('class' => 'btn btn-info')) }}</td>
                     <td>
-                        {{ Form::open(array('method' => 'DELETE', 'route' => array('{$models}.destroy', \${$model}->id))) }}
-                            {{ Form::submit('Delete', array('class' => 'btn btn-danger')) }}
+                        {{ Form::open(array('method' => 'DELETE', 'route' => array('{$model}s.destroy', \${$model}->id))) }}
+                            {{ Form::submit('Delete', array('class' => 'btn btn-danger')) }}</td>
                         {{ Form::close() }}
                     </td>
 EOT;

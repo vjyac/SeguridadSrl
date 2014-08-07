@@ -91,7 +91,7 @@ class FormDumperGenerator {
     {
         $names = array_keys($table);
 
-        return array_diff($names, array('id', 'created_at', 'updated_at', 'deleted_at', 'password'));
+        return array_diff($names, array('id', 'created_at', 'updated_at', 'password'));
     }
 
     /**
@@ -122,14 +122,14 @@ class FormDumperGenerator {
      */
     protected function getFormOpen($method, $model)
     {
-        $models = Pluralizer::plural($model);
+        $collection = Pluralizer::plural($model);
 
         if (preg_match('/edit|update|put|patch/i', $method))
         {
-            return "{{ Form::model(\${$model}, array('method' => 'PATCH', 'route' => array('{$models}.update', \${$model}->id))) }}";
+            return "{{ Form::model(\${$model}, array('method' => 'PATCH', 'route' => array('{$collection}.update', \${$model}->id))) }}";
         }
 
-        return "{{ Form::open(array('route' => '{$models}.store')) }}";
+        return "{{ Form::open(array('route' => '{$collection}.store')) }}";
     }
 
     /**
@@ -157,7 +157,7 @@ class FormDumperGenerator {
         $lookup = array(
             'string'  => 'text',
             'float'   => 'text',
-            'date'    => 'text',
+            'date'    => 'string',
             'text'    => 'textarea',
             'boolean' => 'checkbox'
         );
@@ -176,7 +176,6 @@ class FormDumperGenerator {
      */
     protected function getFormElements($type = 'list', $element)
     {
-        $form = array();
         $template = $this->getTemplate("{$type}-block");
         $attributes = $this->getModelAttributes($this->tableInfo);
 
@@ -202,7 +201,7 @@ class FormDumperGenerator {
             'element'   => $element,
             'name'      => $name,
             'type'      => $this->getInputType($name),
-            'label'     => str_replace('_', ' ', ucwords($name)) . ':'
+            'label'     => ucwords($name) . ':'
         ));
     }
 

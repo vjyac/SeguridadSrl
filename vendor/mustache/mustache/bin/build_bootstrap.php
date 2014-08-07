@@ -4,7 +4,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2012 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,13 +20,13 @@
  * containing all Mustache library classes. This file can then be included in
  * your project, rather than requiring the Mustache Autoloader.
  */
-$baseDir = realpath(dirname(__FILE__).'/..');
+$baseDir = realpath(dirname(__FILE__) . '/..');
 
-require $baseDir.'/src/Mustache/Autoloader.php';
+require $baseDir . '/src/Mustache/Autoloader.php';
 Mustache_Autoloader::register();
 
 // delete the old file
-$file = $baseDir.'/mustache.php';
+$file = $baseDir . '/mustache.php';
 if (file_exists($file)) {
     unlink($file);
 }
@@ -34,6 +34,10 @@ if (file_exists($file)) {
 // and load the new one
 SymfonyClassCollectionLoader::load(array(
     'Mustache_Engine',
+    'Mustache_Cache',
+    'Mustache_Cache_AbstractCache',
+    'Mustache_Cache_FilesystemCache',
+    'Mustache_Cache_NoopCache',
     'Mustache_Compiler',
     'Mustache_Context',
     'Mustache_Exception',
@@ -73,7 +77,7 @@ SymfonyClassCollectionLoader::load(array(
  */
 class SymfonyClassCollectionLoader
 {
-    static private $loaded;
+    private static $loaded;
 
     const HEADER = <<<EOS
 <?php
@@ -81,7 +85,7 @@ class SymfonyClassCollectionLoader
 /*
  * This file is part of Mustache.php.
  *
- * (c) %d Justin Hileman
+ * (c) 2010-%d Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -98,7 +102,7 @@ EOS;
      *
      * @throws InvalidArgumentException When class can't be loaded
      */
-    static public function load(array $classes, $cacheDir, $name, $extension = '.php')
+    public static function load(array $classes, $cacheDir, $name, $extension = '.php')
     {
         // each $name can only be loaded once per PHP process
         if (isset(self::$loaded[$name])) {
@@ -117,9 +121,9 @@ EOS;
             $content .= preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
         }
 
-        $cache  = $cacheDir.'/'.$name.$extension;
+        $cache  = $cacheDir . '/' . $name . $extension;
         $header = sprintf(self::HEADER, strftime('%Y'));
-        self::writeCacheFile($cache, $header . substr(self::stripComments('<?php '.$content), 5));
+        self::writeCacheFile($cache, $header . substr(self::stripComments('<?php ' . $content), 5));
     }
 
     /**
@@ -130,7 +134,7 @@ EOS;
      *
      * @throws RuntimeException when a cache file cannot be written
      */
-    static private function writeCacheFile($file, $content)
+    private static function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
@@ -152,7 +156,7 @@ EOS;
      *
      * @return string The PHP string with the comments removed
      */
-    static private function stripComments($source)
+    private static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;

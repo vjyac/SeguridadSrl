@@ -11,7 +11,7 @@
 
 	<nav class="navbar navbar-inverse">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="{{ URL::to('/ventasmovimientos') }}">Ventas Movimientos</a>
+			<div class="navbar-brand">Informe Ventas</div>
 		</div>
 	</nav>
 
@@ -20,18 +20,27 @@
 			<header class="panel-heading font-bold">{{ $title }}</header>
 			<div class="panel-body">
 				{{ Form::open(array('route' => 'ventasmovimientos.ventashow', "autocomplete"=>"off"
-, 'class' => 'panel-body wrapper-lg')) }}
-				
+, 'class' => 'panel-body wrapper-lg', 'target' => '_blank')) }}
+
 
           @if (isset($flash_message))
           <div class="alert alert-warning">{{ $flash_message }}</div>
           @endif
 
-										
+
 								<div class="row">
 									<div class="col-xs-5">
 									<label>Fecha desde</label>
 										{{ Form::text('fecha_desde', '', array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha_desde', 'placeholder' => 'Fecha', 'data-date-format' => 'dd-mm-yyyy')) }}
+										<br> <?php
+											if ($errors->first('fecha_desde')) {
+													?>
+												<div class="alert alert-danger">
+												<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+												<div class="alert-link">{{ $errors->first('fecha_desde') }}</div>
+											</div>
+										<?php } ?>
+
 									</div>
 								</div>
 
@@ -39,8 +48,36 @@
 									<div class="col-xs-5">
 									<label>Fecha hasta</label>
 										{{ Form::text('fecha_hasta', '', array('class' => 'datepicker-input form-control input-lg', 'id' =>'fecha_hasta', 'placeholder' => 'Fecha', 'data-date-format' => 'dd-mm-yyyy')) }}
+										<br> <?php
+											if ($errors->first('fecha_hasta')) {
+													?>
+												<div class="alert alert-danger">
+												<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+												<div class="alert-link">{{ $errors->first('fecha_hasta') }}</div>
+											</div>
+										<?php } ?>
+
 									</div>
 								</div>
+
+
+								<div class="row">
+								<div class="col-xs-8">
+								<label>Empresa</label>
+									{{ Form::select( 'empresas_id', Empresa::All()->
+												lists('empresa', 'id'), Input::get('empresa'), array( "placeholder" => "", 'class' => 'form-control input-lg')) }}
+										<br> <?php
+											if ($errors->first('empresas_id')) {
+													?>
+												<div class="alert alert-danger">
+												<button type="button" class="close" data-dismiss="alert">&times;</button> <i class="fa fa-ban-circle"></i> <strong>Ups... error!</strong>
+												<div class="alert-link">{{ $errors->first('empresas_id') }}</div>
+											</div>
+										<?php } ?>
+
+								</div>
+								</div>
+
 
 <br>
 				{{ Form::submit('Buscar movimientos ventas', array('class' => 'btn btn-primary')) }}
@@ -58,7 +95,7 @@
 
 var jq = jQuery.noConflict();
     jq(document).ready( function(){
-        
+
 
 
 
@@ -68,7 +105,7 @@ var jq = jQuery.noConflict();
 
 });
 
-  
+
 </script>
 
 <script src="/js/datepicker/bootstrap-datepicker.js" cache="false"></script>

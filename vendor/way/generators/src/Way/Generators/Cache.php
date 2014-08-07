@@ -1,4 +1,6 @@
-<?php namespace Way\Generators;
+<?php
+
+namespace Way\Generators;
 
 use Illuminate\Filesystem\Filesystem as File;
 

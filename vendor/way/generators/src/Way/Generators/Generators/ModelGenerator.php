@@ -8,19 +8,19 @@ class ModelGenerator extends Generator {
      * Fetch the compiled template for a model
      *
      * @param  string $template Path to template
-     * @param  string $className
+     * @param  string $name
      * @return string Compiled template
      */
-    protected function getTemplate($template, $className)
+    protected function getTemplate($template, $name)
     {
         $this->template = $this->file->get($template);
 
         if ($this->needsScaffolding($template))
         {
-            $this->template = $this->getScaffoldedModel($className);
+            $this->template = $this->getScaffoldedModel($name);
         }
 
-        return str_replace('{{className}}', $className, $this->template);
+        return str_replace('{{name}}', $name, $this->template);
     }
 
     /**
@@ -30,7 +30,7 @@ class ModelGenerator extends Generator {
      * @param  string $name
      * @return string
      */
-    protected function getScaffoldedModel($className)
+    protected function getScaffoldedModel($name)
     {
         if (! $fields = $this->cache->getFields())
         {
@@ -39,7 +39,7 @@ class ModelGenerator extends Generator {
 
         $rules = array_map(function($field) {
             return "'$field' => 'required'";
-        }, array_keys($fields));
+        }, array_flip($fields));
 
         return str_replace('{{rules}}', PHP_EOL."\t\t".implode(','.PHP_EOL."\t\t", $rules) . PHP_EOL."\t", $this->template);
     }

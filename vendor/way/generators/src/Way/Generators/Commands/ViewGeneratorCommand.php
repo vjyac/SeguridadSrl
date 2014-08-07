@@ -22,7 +22,7 @@ class ViewGeneratorCommand extends BaseGeneratorCommand {
     protected $description = 'Generate a new view.';
 
     /**
-     * Model generator instance.
+     * Model generator instance
      *
      * @var Way\Generators\Generators\ViewGenerator
      */
@@ -60,7 +60,7 @@ class ViewGeneratorCommand extends BaseGeneratorCommand {
     protected function getOptions()
     {
         return array(
-           array('path', null, InputOption::VALUE_OPTIONAL, 'Path to views directory.', app_path() . '/views'),
+           array('path', null, InputOption::VALUE_OPTIONAL, 'Path to views directory.', 'app/views'),
            array('template', null, InputOption::VALUE_OPTIONAL, 'Path to template.', __DIR__.'/../Generators/templates/view.txt'),
         );
     }
