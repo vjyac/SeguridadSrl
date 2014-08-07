@@ -2,6 +2,7 @@
 -- version 4.1.12
 -- http://www.phpmyadmin.net
 --
+--
 -- Servidor: localhost:8889
 -- Tiempo de generación: 07-08-2014 a las 23:52:58
 -- Versión del servidor: 5.5.34
