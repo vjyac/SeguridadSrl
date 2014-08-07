@@ -29,6 +29,7 @@ class UsersController extends BaseController {
 	public function store()
 	{
 
+		return Redirect::to('/');
 
 
 		if (! User::isValid(Input::all())) {
